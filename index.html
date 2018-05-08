@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Live Chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 14px Helvetica, Arial; background-color: darkgray }
+      form { padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 0px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: lightgreen; border: none; padding: 0px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" /><button>Send</button>
+    </form>
+  </body>
+</html>
+
+<script src="/socket.io/socket.io.js"></script> <!--  Load the socket.io-client -->
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  $(() => {
+    const socket = io();  // Load the socket.io-client by exposing an "io" global. Calling io() defaults to trying to connect to the host that serves this page (See next commented line for example).
+    // const socket = io.connect('http://localhost:3000');
+    
+    $('form').submit( () => { // When the form is submitted, do...
+      socket.emit('chat message', $('#m').val()); // Emits a "chat message" event to server with the value from ID "m".
+      $('#m').val(''); // Clear the input field after sending message with an empty string argument.
+      return false; // Exit out of function.
+    });
+    
+    socket.on('chat message', (msg) => { // Listens for a "chat message" emitter from the server(?) and receives the "msg" value from the server (that originally came from the .submit function above).
+      $('#messages').append($('<li>').text(msg)); // Take the tag with "id="messages"", add an "<li>" element inside "<ul>" element wrapped around the "msg" String value.
+    });
+  });
+</script>
